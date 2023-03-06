@@ -55,6 +55,12 @@ pub fn parser() -> Result<structs::Args, pico_args::Error> {
         // FPS
         fps: args.opt_value_from_str("--fps")?,
 
+        // Scale
+        scale: args.opt_value_from_str(["-s", "--scale"])?,
+
+        // Volume
+        volume: args.opt_value_from_str(["--vol", "--volume"])?,
+
         // Output
         output: match args.free_from_os_str(parse_path) {
             Err(_) => {

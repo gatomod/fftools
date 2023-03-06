@@ -19,22 +19,25 @@ pub fn help() {
 		{commands}
 			trim	Trims video between a range [ at least `--from` or `--to` ]
 			gif	Converts video into lossless GIF [ no options ]
+			scale	Scale a file by percentage [ `--scale` ]
 			free	Dynamic subcommand [ any option ]
 
 
 		{options}
-		Stream management:
+		IO management:
 			-i, --input <file>	Input file
 			-w, --overwrite		Overwrite output
 		
 		Media manipulation:
-			-f, --from <time>  Start timestamp
-			-t, --to <time>    End timestamp
+			-f, --from <time>	Start timestamp
+			-t, --to <time>		End timestamp
+			-s, --scale <percentage>	Scale percentage
+			    --fps		Set framerate
 
 		Miscellaneous:
-			-V, --verbose   Add verbosity
-			-h, --help      Show this message
-			-v, --version   Show FFtools version
+			-V, --verbose	Add verbosity
+			-h, --help	Show this message
+			-v, --version	Show FFtools version
 		\n",
         title="<< FFtools >>".cyan().bold(),
         usage="USAGE".bold(),

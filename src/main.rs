@@ -74,6 +74,12 @@ fn main() {
             vf_args.push("[a]palettegen[p]");
             vf_args.push("[b][p]paletteuse");
         }
+        "scale" => {
+            if args.scale.is_none() {
+                logs::ferror("scale".into(), vec!["--scale"], None);
+                exit(1);
+            }
+        }
         _ => {
             logs::error(format!("Unknown `{}` command.", args.command), None);
             exit(1)
@@ -100,6 +106,26 @@ fn main() {
     if let Some(fps) = args.fps.as_ref() {
         ffmpeg_args.push("-r");
         ffmpeg_args.push(fps.as_str());
+    }
+
+    // Scale
+    let scale_str: String;
+    if let Some(scale) = args.scale.as_ref() {
+        scale_str = format!(
+            "scale=iw*{p}:ih*{p}",
+            p = scale.parse::<f64>().unwrap_or_else(|_| {
+                logs::error("Please insert a valid number.".into(), None);
+                exit(1);
+            }) / 100.0
+        );
+        vf_args.push(&scale_str)
+    }
+
+    // Volume
+    // TODO add dB and percentage support (100 as 1, https://trac.ffmpeg.org/wiki/AudioVolume)
+    let vol_str: String;
+    if let Some(volume) = args.volume.as_ref() {
+        vol_str = format!("volume={}", volume);
     }
 
     // Media filters

@@ -64,4 +64,19 @@ pub struct Args {
     /// `-r`
     // FIXME this should be u32. See `FIXME (1)` in main.rs
     pub fps: Option<String>,
+
+    /// ## Resize
+    /// Changes width and height based on percentage
+    ///
+    /// ### FFmpeg equivalent
+    /// `-vf scale=iw*.5:ih*.5`
+    // FIXME this should be u32. See `FIXME (1)` in main.rs
+    pub scale: Option<String>,
+
+    /// ## Volume
+    /// Changes width and height based on percentage
+    ///
+    /// ### FFmpeg equivalent
+    /// `-af volume=10dB`
+    pub volume: Option<String>,
 }
