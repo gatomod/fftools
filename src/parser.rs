@@ -59,7 +59,7 @@ pub fn parser() -> Result<structs::Args, pico_args::Error> {
         scale: args.opt_value_from_str(["-s", "--scale"])?,
 
         // Volume
-        volume: args.opt_value_from_str(["--vol", "--volume"])?,
+        volume: args.opt_value_from_str(["-vv", "--volume"])?,
 
         // Output
         output: match args.free_from_os_str(parse_path) {

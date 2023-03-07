@@ -80,6 +80,13 @@ fn main() {
                 exit(1);
             }
         }
+        "volume" => {
+            if args.volume.is_none() {
+                logs::ferror("volume".into(), vec!["--volume"], None);
+                exit(1);
+            }
+        }
+
         _ => {
             logs::error(format!("Unknown `{}` command.", args.command), None);
             exit(1)
@@ -118,14 +125,25 @@ fn main() {
                 exit(1);
             }) / 100.0
         );
-        vf_args.push(&scale_str)
+        vf_args.push(&scale_str);
     }
 
     // Volume
-    // TODO add dB and percentage support (100 as 1, https://trac.ffmpeg.org/wiki/AudioVolume)
     let vol_str: String;
     if let Some(volume) = args.volume.as_ref() {
-        vol_str = format!("volume={}", volume);
+        vol_str = format!(
+            "volume={}",
+            if volume.ends_with("dB") {
+                volume.to_string()
+            } else {
+                (volume.parse::<f64>().unwrap_or_else(|_| {
+                    logs::error("Please insert a valid number.".into(), None);
+                    exit(1);
+                }) / 100.0)
+                    .to_string()
+            }
+        );
+        af_args.push(&vol_str);
     }
 
     // Media filters
@@ -150,6 +168,7 @@ fn main() {
 
     // Check if file exists
     // This is checked after parsing args in case of output modification
+
     if args.output.exists() && !args.overwrite {
         logs::error(
             format!(

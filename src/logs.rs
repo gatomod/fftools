@@ -8,9 +8,10 @@ const HELP: &str = "Use `--help` for more information.";
 pub fn help() {
     printdoc! {
         "{title}
-		FFmpeg-based toolkit for manipulate multimedia easily.
+		FFmpeg-based toolkit for manipulate multimedia easily
 		
-		Licensed under the Apache License, Version 2.0.
+		Copyright 2023 Gátomo
+        Licensed under the Apache License, Version 2.0
 		< https://www.apache.org/licenses/LICENSE-2.0 >
 
 		{usage}
@@ -20,6 +21,7 @@ pub fn help() {
 			trim	Trims video between a range [ at least `--from` or `--to` ]
 			gif	Converts video into lossless GIF [ no options ]
 			scale	Scale a file by percentage [ `--scale` ]
+			volume  Set audio volume [ `--volume` ]
 			free	Dynamic subcommand [ any option ]
 
 
@@ -29,10 +31,11 @@ pub fn help() {
 			-w, --overwrite		Overwrite output
 		
 		Media manipulation:
-			-f, --from <time>	Start timestamp
-			-t, --to <time>		End timestamp
+			-f, --from <time>		Start timestamp
+			-t, --to <time>			End timestamp
 			-s, --scale <percentage>	Scale percentage
-			    --fps		Set framerate
+			    --fps <fps>			Set framerate
+			-vv, --volume <level>		Set volume (dB or percentage)
 
 		Miscellaneous:
 			-V, --verbose	Add verbosity
