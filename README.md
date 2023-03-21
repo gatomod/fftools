@@ -6,7 +6,7 @@
 <br />
 
 [<img alt="license" src="https://img.shields.io/github/license/gatomo-oficial/path_trav.svg?color=06b6d4&style=for-the-badge&logo=Apache">](https://www.apache.org/licenses/LICENSE-2.0)
-[<img alt="crates.io" src="https://img.shields.io/crates/v/fftools.svg?style=for-the-badge&color=fc8d62&logo=rust">](https://crates.io/crates/path_trav)
+[<img alt="crates.io" src="https://img.shields.io/crates/v/fftools.svg?style=for-the-badge&color=fc8d62&logo=rust">](https://crates.io/crates/fftools)
 [<img alt="discord" src="https://img.shields.io/discord/880947411432923136?style=for-the-badge&color=blue&logo=discord">](https://gatomo.ga/discord)
 
 FFtools is a FFmpeg command spawner made in Rust that focuses on simplicity in different common tasks (such as trim, optimize, merge, etc.).
