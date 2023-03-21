@@ -1,11 +1,22 @@
 [package]
 name = "fftools"
 version = "1.0.0"
+description = "FFMPEG-based toolkit for easy media manipulation"
+license = "Apache-2.0"
+authors = ["Gátomo"]
+readme = "README.md"
+homepage = "https://github.com/gatomo-oficial/fftools"
+repository = "https://github.com/gatomo-oficial/fftools"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[package.metadata]
+depends = ["ffmpeg"]
+
+[package.metadata.deb]
+depends = "ffmpeg"
 
 [dependencies]
 colored = "2.0.0"
 indoc = "2.0.0"
-pico-args = "0.5.0"
+pico-args = {version = "0.5.0", features = ["eq-separator", "short-space-opt", "combined-flags"]}
+tabled = "0.10.0"

@@ -1,66 +1,123 @@
 use colored::*;
-use indoc::printdoc;
+use tabled::Style;
+use tabled::TableIteratorExt;
+use tabled::{format::Format, object::Columns, Modify};
 
 const HELP: &str = "Use `--help` for more information.";
 
+fn parse_table(input: &[[&str; 2]]) -> String {
+    input
+        .table()
+        .with(Style::blank())
+        .with(Modify::new(Columns::single(0)).with(Format::new(|s| s.bold().yellow().to_string())))
+        .to_string()
+        .lines()
+        .skip(1)
+        .map(|e| e)
+        .collect::<Vec<&str>>()
+        .join("\n    ")
+}
+
 /// ## Help
 /// Help string with command list.
+// TODO add help generator
 pub fn help() {
-    printdoc! {
-        "{title}
-		FFmpeg-based toolkit for manipulate multimedia easily
-		
-		Copyright 2023 Gátomo
-        Licensed under the Apache License, Version 2.0
-		< https://www.apache.org/licenses/LICENSE-2.0 >
+    #[rustfmt::skip]
+    let cmd_table = [
+        ["o, optimize", "Reduce input TBN to reduce file size with not much loss of quality"],
+        ["t, trim",     "Trims media between a range"],
+        ["g, gif",      "Converts video into lossless GIF"],
+        ["s, scale",    "Scale a file by percentage"],
+        ["v, volume",   "Set audio volume"],
+        ["m, merge",    "Merge audio and video"],
+        ["   fps",      "Set framerate"],
+        ["f, free",     "Dynamic subcommand"],
+    ];
 
-		{usage}
-			fftools <SUBCOMMAND> -i <INPUT> [OPTIONS] <OUTPUT>
+    #[rustfmt::skip]
+    let io_table = [
+        ["-i, --input <file>",  "Input file"],
+        ["-w, --overwrite",     "Overwrite output"],
+    ];
 
-		{commands}
-			trim	Trims video between a range [ at least `--from` or `--to` ]
-			gif	Converts video into lossless GIF [ no options ]
-			scale	Scale a file by percentage [ `--scale` ]
-			volume  Set audio volume [ `--volume` ]
-			free	Dynamic subcommand [ any option ]
+    #[rustfmt::skip]
+    let manipulation_table = [
+        ["-f, --from <time>",       "Start timestamp"],
+        ["-t, --to <time>",         "End timestamp"],
+        ["-s, --scale <percent>",   "Scale percentage"],
+        ["    --fps <fps>",         "Set framerate"],
+        ["-l, --volume <level>",    "Set volume (dB or percentage)"],
+        ["-n, --noaudio",           "Silent media"],
+        ["    --notrim",            "Avoid media trimming (useful for `trim` command)",],
+    ];
 
+    #[rustfmt::skip]
+    let encode_table = [
+        ["-o, --optimize",  "Reduces TBN"],
+        ["-e, --encode",    "Encode input stream to output format"],
+        ["    --vencode",       "Encode video"],
+        ["    --aencode",       "Encode audio"],
+        ["-c, --copy",      "Copy input stream to output (no encode)"],
+        ["    --vcopy",         "Copy video"],
+        ["    --acopy",         "Copy audio"],
+    ];
 
-		{options}
-		IO management:
-			-i, --input <file>	Input file
-			-w, --overwrite		Overwrite output
-		
-		Media manipulation:
-			-f, --from <time>		Start timestamp
-			-t, --to <time>			End timestamp
-			-s, --scale <percentage>	Scale percentage
-			    --fps <fps>			Set framerate
-			-vv, --volume <level>		Set volume (dB or percentage)
+    #[rustfmt::skip]
+    let misc_table = [
+        ["-V, --verbose",   "Add verbosity"],
+        ["-h, --help",      "Show this message"],
+        ["-v, --version",   "Show FFtools version"],
+    ];
 
-		Miscellaneous:
-			-V, --verbose	Add verbosity
-			-h, --help	Show this message
-			-v, --version	Show FFtools version
-		\n",
-        title="<< FFtools >>".cyan().bold(),
-        usage="USAGE".bold(),
-        commands="COMMANDS".bold(),
-        options="OPTIONS/FLAGS".bold(),
-    };
-    /* println!(
-        r#"{}
-        {}
-        FFmpeg-based toolkit for manipulate multimedia easily.
-        Licensed under the Apache License, Version 2.0.
+    println!(
+        r#"{title}
+FFMPEG-based toolkit for easy media manipulation
 
-        < https://www.apache.org/licenses/LICENSE-2.0 >"#,
-        "<< FFtools >>".cyan().bold(),
-        format!(
-            "Version {} - Copyright 2023 Gátomo",
-            env!("CARGO_PKG_VERSION")
-        )
-        .italic()
-    ) */
+Copyright 2023 Gátomo
+Licensed under the Apache License, Version 2.0
+{apache}
+
+{usage}
+    {usage_struct}
+
+{commands}
+    {commands_table}
+
+{options}
+{io}
+    {io_table}
+
+{manipulation}
+    {manipulation_table}
+
+{encode}
+    {encode_table}
+
+{misc}
+    {misc_table}
+
+{doc_title}
+See GitHub Wiki for detailed description of commands and options.
+{wiki}
+"#,
+        title = "<< FFtools >>".cyan().bold(),
+        apache = "< https://www.apache.org/licenses/LICENSE-2.0 >".italic(),
+        usage = "USAGE".green().bold(),
+        usage_struct = "fftools <SUBCOMMAND> -i <INPUT> [OPTIONS] <OUTPUT> [SUB_VALUES]".bold(),
+        commands = "COMMANDS".green().bold(),
+        commands_table = parse_table(&cmd_table),
+        options = "OPTIONS/FLAGS".green().bold(),
+        io = "IO management:".bold(),
+        io_table = parse_table(&io_table),
+        manipulation = "Media manipulation:".bold(),
+        manipulation_table = parse_table(&manipulation_table),
+        encode = "Media codification:".bold(),
+        encode_table = parse_table(&encode_table),
+        misc = "Miscellaneous:".bold(),
+        misc_table = parse_table(&misc_table),
+        doc_title = "Something is missing?".cyan().bold(),
+        wiki = "< https://github.com/gatomo-oficial/fftools/wiki >".italic()
+    );
 }
 
 pub fn version() {
@@ -90,9 +147,9 @@ pub fn error(msg: String, tip: Option<String>) {
     )
 }
 
-/// ## ferror
+/// ## flag_error
 /// Prints a list of missing flags.
-pub fn ferror(cmd: String, flags: Vec<&str>, min: Option<u8>) {
+pub fn flag_error(cmd: &str, flags: Vec<&str>, min: Option<&str>) {
     eprintln!(
         "{} `{}` command requires{} the next flags:\n{}\n\n{}",
         "Error >".red().bold(),
@@ -105,6 +162,23 @@ pub fn ferror(cmd: String, flags: Vec<&str>, min: Option<u8>) {
         flags.join("\n"),
         HELP.italic()
     )
+}
+
+/// ## args_error
+/// Prints a list of missing args.
+pub fn args_error(cmd: &str) {
+    eprintln!(
+        "{} `{}` command requires a value\n{}",
+        "Error >".red().bold(),
+        cmd,
+        HELP.italic()
+    )
+}
+
+/// ## nan_error
+/// Prints a NaN error
+pub fn nan_error() {
+    error("Please insert a valid number.".into(), None);
 }
 
 /// ## Warn

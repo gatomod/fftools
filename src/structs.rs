@@ -1,82 +1,70 @@
-use std::path::PathBuf;
+use std::{path::PathBuf, process::exit};
 
-#[derive(Debug)]
+use crate::parser::{parser, pico_args_error_handler};
+
+/// ### Args
+/// List of arguments to be parsed by `pico_args`
+///
+/// By default, all arguments are options, except booleans (flags) and input (vector)
+///
+#[rustfmt::skip]
+#[derive(Clone)]
 pub struct Args {
-    /// ## Command
-    /// Specify the command to use
-    ///
-    /// - Required
-    ///
-    /// ### FFmpeg equivalent
-    /// This is a FFtools feature
-    pub command: String,
+	pub command: Option<String>,
 
-    /// ## Input
-    /// Set the input file.
-    ///
-    /// - Required
-    ///
-    /// ### FFmpeg equivalent
-    /// `-i`
-    pub input: PathBuf,
+	pub input: Vec<PathBuf>,
 
-    /// ## Output
-    /// Set the output file.
-    ///
-    /// - Required
-    ///
-    /// ### FFmpeg equivalent
-    /// *No flags.*
-    pub output: PathBuf,
+	pub version:        bool,
+	pub help:           bool,
+	pub verbose:        bool,
+	pub overwrite:      bool,
+	pub no_audio:       bool,
+	pub no_trim:        bool,
 
-    /// ## From
-    /// Seeks to start timestamp
-    ///
-    /// ### FFmpeg equivalent
-    /// `-ss`
-    pub from: Option<String>,
+	pub encode:         bool,
+	pub audio_encode:   bool,
+	pub video_encode:   bool,
 
-    /// ## To
-    /// Seeks to end timestamp
-    ///
-    /// ### FFmpeg equivalent
-    /// `-to`
-    pub to: Option<String>,
+	pub copy:           bool,
+	pub audio_copy:     bool,
+	pub video_copy:     bool,
 
-    /// ## Verbose
-    /// Prints the FFmpeg stdout/stderr
-    ///
-    /// ### FFmpeg equivalent
-    /// This is a FFtools feature
-    pub verbose: bool,
+	pub optimize: 	Option<String>,
+	pub from:   	Option<String>,
+	pub to:     	Option<String>,
+	pub scale:  	Option<u64>,
+	pub volume: 	Option<String>,
+	pub fps:    	Option<u64>,
 
-    /// ## Overwrite
-    /// Overwrite the output if exists
-    ///
-    /// ### FFmpeg equivalent
-    /// `-y`
-    pub overwrite: bool,
+	pub output: Option<PathBuf>,
+}
 
-    /// ## Overwrite
-    /// Overwrite the output if exists
-    ///
-    /// ### FFmpeg equivalent
-    /// `-r`
-    // FIXME this should be u32. See `FIXME (1)` in main.rs
-    pub fps: Option<String>,
+/// ### Data
+/// Main struct, with FFmpeg argument vectors and parser
+///
+#[rustfmt::skip]
+pub struct Data {
+	pub ffmpeg_args:    Vec<String>,
+	pub af_args:        Vec<String>,
+	pub vf_args:        Vec<String>,
+	
+	pub args:           Args,
+	pub pico_parser:    pico_args::Arguments,
+}
 
-    /// ## Resize
-    /// Changes width and height based on percentage
-    ///
-    /// ### FFmpeg equivalent
-    /// `-vf scale=iw*.5:ih*.5`
-    // FIXME this should be u32. See `FIXME (1)` in main.rs
-    pub scale: Option<String>,
+impl Data {
+    pub fn init(mut pico_parser: pico_args::Arguments) -> Self {
+        let args = parser(&mut pico_parser).unwrap_or_else(|err| {
+            pico_args_error_handler(err);
+            exit(1)
+        });
 
-    /// ## Volume
-    /// Changes width and height based on percentage
-    ///
-    /// ### FFmpeg equivalent
-    /// `-af volume=10dB`
-    pub volume: Option<String>,
+        Self {
+            ffmpeg_args: vec![],
+            af_args: vec![],
+            vf_args: vec![],
+            args,
+            pico_parser,
+        }
+    }
 }
